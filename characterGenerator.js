@@ -83,10 +83,10 @@ class CharacterGenerator {
             
             // Sample the corners to determine background color
             const cornerSamples = [
-                getPixelAt(data, 0, 0, canvas.width),                        // Top-left
-                getPixelAt(data, canvas.width - 1, 0, canvas.width),         // Top-right
-                getPixelAt(data, 0, canvas.height - 1, canvas.width),        // Bottom-left
-                getPixelAt(data, canvas.width - 1, canvas.height - 1, canvas.width)  // Bottom-right
+                this.getPixelAt(data, 0, 0, canvas.width),                        // Top-left
+                this.getPixelAt(data, canvas.width - 1, 0, canvas.width),         // Top-right
+                this.getPixelAt(data, 0, canvas.height - 1, canvas.width),        // Bottom-left
+                this.getPixelAt(data, canvas.width - 1, canvas.height - 1, canvas.width)  // Bottom-right
             ];
             
             // Calculate average background color from corners
@@ -130,7 +130,7 @@ class CharacterGenerator {
     }
 
     // Helper function to get pixel data at specific coordinates
-    function getPixelAt(data, x, y, width) {
+    getPixelAt(data, x, y, width) {
         const idx = (y * width + x) * 4;
         return {
             r: data[idx],
