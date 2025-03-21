@@ -42,6 +42,10 @@ const App = () => {
         setIsTracking(false);
         const points = mouseTracker.stopTracking();
         const keywords = mouseTracker.getKeywordsFromMovement();
+        const movementCharacteristics = mouseTracker.getMovementCharacteristics();
+        
+        // Store movement characteristics for character generation later
+        mouseTracker.movementCharacteristics = movementCharacteristics;
         
         // Generate Mad Libs using the keywords
         const generatedMadLibs = madLibsGenerator.generateMadLibs(keywords);
@@ -81,11 +85,17 @@ const App = () => {
             // Fill in the Mad Libs story with user inputs
             const filledMadLibs = madLibsGenerator.fillMadLibs(madLibs, madLibsInputs);
             
-            // Generate character based on the story
-            const generatedCharacter = await characterGenerator.generateCharacter(filledMadLibs, madLibsInputs);
+            // Generate character based on the story and mouse movement
+            const generatedCharacter = await characterGenerator.generateCharacter(
+                filledMadLibs, 
+                madLibsInputs,
+                mouseTracker.movementCharacteristics || ['default', 'character']
+            );
             
             // Process the image for the game (remove background, etc.)
-            generatedCharacter.processedUrl = await characterGenerator.processImageForGame(generatedCharacter.url);
+            generatedCharacter.processedUrl = await characterGenerator.processImageForGame(
+                generatedCharacter.characterUrl
+            );
             
             setCharacter(generatedCharacter);
             setStep('character');
@@ -182,7 +192,8 @@ const App = () => {
                     <h1>Your Character</h1>
                     
                     <div className="character-display">
-                        <img src={character.processedUrl || character.url} alt="Generated character" className="character-image" />
+                        <img src={character.backgroundUrl} alt="Character background" className="character-background" />
+                        <img src={character.processedUrl || character.characterUrl} alt="Generated character" className="character-foreground" />
                         
                         <div className="character-story">
                             <h2>Character Story</h2>
@@ -206,4 +217,3 @@ const App = () => {
 };
 
 ReactDOM.render(<App />, document.getElementById('app'));
-

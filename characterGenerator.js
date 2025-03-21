@@ -3,32 +3,48 @@ import { config } from './config.js';
 class CharacterGenerator {
     constructor() {
         this.llmPromptTemplate = config.characterPromptInstructions;
+        this.circlePromptTemplate = config.characterCirclePromptInstructions;
+        this.backgroundPromptTemplate = config.backgroundPromptInstructions;
     }
     
-    async generateCharacter(madLibsStory, inputs) {
+    async generateCharacter(madLibsStory, inputs, mouseData) {
         try {
-            // Prepare the prompt for the LLM
+            // Prepare the prompts for the LLM
             const storyKeywords = Object.values(inputs).join(', ');
             const storyText = madLibsStory.filledText.replace(/<[^>]*>/g, '');
             
-            const prompt = `
-                Create a character based on this Mad Libs story:
+            // Generate the character image based on mouse movement
+            const characterPrompt = `
+                Create a character with these traits:
+                Movement pattern: ${mouseData.join(', ')}
+                
+                ${this.circlePromptTemplate}
+            `;
+            
+            const characterResult = await websim.imageGen({
+                prompt: characterPrompt,
+                aspect_ratio: "1:1"
+            });
+            
+            // Generate the background image based on Mad Libs
+            const backgroundPrompt = `
+                Create a background based on this Mad Libs story:
                 
                 ${storyText}
                 
                 Keywords: ${storyKeywords}
                 
-                ${this.llmPromptTemplate}
+                ${this.backgroundPromptTemplate}
             `;
             
-            // Generate the character image
-            const result = await websim.imageGen({
-                prompt: prompt,
-                aspect_ratio: "1:1"
+            const backgroundResult = await websim.imageGen({
+                prompt: backgroundPrompt,
+                aspect_ratio: "16:9"
             });
             
             return {
-                url: result.url,
+                characterUrl: characterResult.url,
+                backgroundUrl: backgroundResult.url,
                 story: storyText,
                 keywords: storyKeywords,
                 inputs: inputs
@@ -61,4 +77,3 @@ class CharacterGenerator {
 }
 
 export default new CharacterGenerator();
-

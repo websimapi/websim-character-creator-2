@@ -28,6 +28,24 @@ export const config = {
         - ALWAYS be in a scene with a white or black solid background, nothing else
         
         Generate an image of this character that looks cute, simple, and suitable for a 2D game.
+    `,
+    
+    characterCirclePromptInstructions: `
+        Create a character with these characteristics:
+        - ALWAYS be a perfect circle shape
+        - ALWAYS have a face with expressions
+        - ALWAYS have no legs, no feet, and no hands
+        - ALWAYS be on a pure transparent background
+        
+        Generate an image of just this character that looks cute, simple, and suitable for a 2D game.
+    `,
+    
+    backgroundPromptInstructions: `
+        Create a simple background scene based on the story, with these characteristics:
+        - Simple, minimal design that won't overpower a character
+        - Either a white or solid black background, nothing else
+        - Suitable for a 2D game
+        
+        Generate an image of just this background.
     `
 };
-
