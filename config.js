@@ -47,5 +47,17 @@ export const config = {
         - Suitable for a 2D game
         
         Generate an image of just this background.
-    `
+    `,
+    
+    // Word grid configuration
+    wordGridSize: 5, // 5x5 grid
+    wordGridVisible: false, // Set to true for debugging
+    
+    // Word categories for the grid
+    wordCategories: {
+        nouns: ['castle', 'dragon', 'wizard', 'potion', 'sword', 'crystal', 'hero', 'monster', 'queen', 'king', 'diamond', 'treasure', 'unicorn', 'spell', 'ghost'],
+        verbs: ['run', 'fly', 'cast', 'fight', 'create', 'destroy', 'transform', 'heal', 'jump', 'dance', 'sing', 'escape', 'conquer', 'swim', 'dive'],
+        adjectives: ['magical', 'ancient', 'glowing', 'mystical', 'powerful', 'enchanted', 'mysterious', 'gigantic', 'tiny', 'colorful', 'brave', 'clever', 'fierce', 'gentle', 'wise'],
+        places: ['forest', 'mountain', 'cave', 'castle', 'village', 'island', 'kingdom', 'dungeon', 'palace', 'tower', 'lake', 'valley', 'temple', 'ruins', 'garden']
+    },
 };

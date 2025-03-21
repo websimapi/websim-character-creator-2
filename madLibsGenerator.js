@@ -19,10 +19,8 @@ class MadLibsGenerator {
     }
     
     generateMadLibs(keywords) {
-        // Select a random template
         const template = this.templates[Math.floor(Math.random() * this.templates.length)];
         
-        // Find all placeholders [word-type]
         const placeholderRegex = /\[(.*?)\]/g;
         const placeholders = [];
         let match;
@@ -31,10 +29,8 @@ class MadLibsGenerator {
             placeholders.push(match[1]);
         }
         
-        // Create unique placeholders (no duplicates)
         const uniquePlaceholders = [...new Set(placeholders)];
         
-        // Create the form fields
         const formFields = uniquePlaceholders.map(placeholder => ({
             id: placeholder + "-" + Math.floor(Math.random() * 1000),
             type: placeholder,
@@ -49,10 +45,68 @@ class MadLibsGenerator {
         };
     }
     
+    generateMadLibsFromStory(story, replacements, selectedWords) {
+        let madLibsText = story;
+        const formFields = [];
+        
+        replacements.sort((a, b) => b.index - a.index);
+        
+        replacements.forEach(replacement => {
+            const placeholder = `[${replacement.replacement}]`;
+            const words = story.split(' ');
+            
+            let foundIndex = -1;
+            for (let i = 0; i < words.length; i++) {
+                const cleanWord = words[i].replace(/[.,!?;:'"-]/g, '').toLowerCase();
+                if (cleanWord === replacement.word.toLowerCase()) {
+                    if (foundIndex === -1 || i === replacement.index) {
+                        foundIndex = i;
+                        if (i === replacement.index) break;
+                    }
+                }
+            }
+            
+            if (foundIndex >= 0) {
+                const punctuation = words[foundIndex].match(/[.,!?;:'"-]/g) || [];
+                words[foundIndex] = placeholder + punctuation.join('');
+                madLibsText = words.join(' ');
+                
+                formFields.push({
+                    id: replacement.replacement + "-" + Math.floor(Math.random() * 1000),
+                    type: replacement.replacement,
+                    label: `Enter a ${replacement.replacement.replace(/-/g, ' ')}:`,
+                    originalWord: replacement.word
+                });
+            }
+        });
+        
+        let title = "Character Story";
+        if (selectedWords.length > 0) {
+            const titleWords = [];
+            const maxTitleWords = Math.min(3, selectedWords.length);
+            const wordsCopy = [...selectedWords];
+            
+            for (let i = 0; i < maxTitleWords; i++) {
+                const randomIndex = Math.floor(Math.random() * wordsCopy.length);
+                titleWords.push(wordsCopy[randomIndex].word);
+                wordsCopy.splice(randomIndex, 1);
+            }
+            
+            title = titleWords.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+        
+        return {
+            title: title,
+            text: madLibsText,
+            formFields: formFields,
+            originalStory: story,
+            selectedWords: selectedWords
+        };
+    }
+    
     fillMadLibs(template, userInputs) {
         let filledText = template.text;
         
-        // Replace each placeholder with user input
         for (const [placeholder, value] of Object.entries(userInputs)) {
             const type = placeholder.split('-')[0];
             const regex = new RegExp(`\\[${type}\\]`, 'g');
@@ -67,4 +121,3 @@ class MadLibsGenerator {
 }
 
 export default new MadLibsGenerator();
-

@@ -9,30 +9,46 @@ class CharacterGenerator {
     
     async generateCharacter(madLibsStory, inputs, mouseData) {
         try {
-            // Prepare the prompts for the LLM
-            const storyKeywords = Object.values(inputs).join(', ');
-            const storyText = madLibsStory.filledText.replace(/<[^>]*>/g, '');
+            // Get the original story and user's filled inputs
+            const storyText = madLibsStory.originalStory || madLibsStory.text;
+            const userInputs = Object.values(inputs).join(', ');
+            const selectedWords = madLibsStory.selectedWords ? 
+                madLibsStory.selectedWords.map(w => w.word).join(', ') : '';
             
-            // Generate the character image based on mouse movement
-            const characterPrompt = `
-                Create a character with these traits:
-                Movement pattern: ${mouseData.join(', ')}
+            // Generate background based on the filled story
+            const filledStory = madLibsGenerator.fillMadLibs(madLibsStory, inputs).filledText;
+            const cleanFilledStory = filledStory.replace(/<[^>]*>/g, '');
+            
+            // Generate detailed scene description using LLM
+            const scenePrompt = `
+                Based on this story:
+                "${cleanFilledStory}"
                 
-                ${this.circlePromptTemplate}
+                Create a detailed description of the scene/background (1-2 paragraphs). 
+                Focus on the environment, weather, time of day, and atmosphere.
+                Don't describe any characters, just the setting.
             `;
             
-            const characterResult = await websim.imageGen({
-                prompt: characterPrompt,
-                aspect_ratio: "1:1"
+            const sceneCompletion = await websim.chat.completions.create({
+                messages: [
+                    {
+                        role: "system",
+                        content: "You are a creative scene designer for a 2D game. Create vivid background descriptions."
+                    },
+                    {
+                        role: "user",
+                        content: scenePrompt
+                    }
+                ]
             });
             
-            // Generate the background image based on Mad Libs
+            const sceneDescription = sceneCompletion.content;
+            
+            // Generate background image based on scene description
             const backgroundPrompt = `
-                Create a background based on this Mad Libs story:
+                Create a background based on this scene description:
                 
-                ${storyText}
-                
-                Keywords: ${storyKeywords}
+                ${sceneDescription}
                 
                 ${this.backgroundPromptTemplate}
             `;
@@ -42,11 +58,26 @@ class CharacterGenerator {
                 aspect_ratio: "16:9"
             });
             
+            // Generate character image based on mouse movement
+            const characterPrompt = `
+                Create a character with these traits:
+                Movement pattern: ${mouseData.join(', ')}
+                Word influences: ${selectedWords}
+                
+                ${this.circlePromptTemplate}
+            `;
+            
+            const characterResult = await websim.imageGen({
+                prompt: characterPrompt,
+                aspect_ratio: "1:1"
+            });
+            
             return {
                 characterUrl: characterResult.url,
                 backgroundUrl: backgroundResult.url,
-                story: storyText,
-                keywords: storyKeywords,
+                story: cleanFilledStory,
+                sceneDescription: sceneDescription,
+                keywords: userInputs,
                 inputs: inputs
             };
         } catch (error) {
