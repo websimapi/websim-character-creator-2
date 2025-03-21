@@ -50,8 +50,8 @@ export const config = {
     `,
     
     // Word grid configuration
-    wordGridSize: 5, // 5x5 grid
-    wordGridVisible: false, // Set to true for debugging
+    wordGridSize: 5, 
+    wordGridVisible: false, 
     
     // Word categories for the grid
     wordCategories: {
