@@ -103,6 +103,11 @@ const App = () => {
         const movementCharacteristics = mouseTracker.getMovementCharacteristics();
         mouseTracker.movementCharacteristics = movementCharacteristics;
 
+        if (selectedWords.length === 0) {
+            setError("Please select some words by holding the mouse button while moving");
+            return;
+        }
+
         setLoading(true);
         try {
             // Use the selected words and LLM to generate a Mad Libs story

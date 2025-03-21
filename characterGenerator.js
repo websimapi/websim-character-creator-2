@@ -16,7 +16,7 @@ class CharacterGenerator {
                 madLibsStory.selectedWords.map(w => w.word).join(', ') : '';
             
             // Generate background based on the filled story
-            const filledStory = madLibsGenerator.fillMadLibs(madLibsStory, inputs).filledText;
+            const filledStory = madLibsStory.filledText || this.fillMadLibsLocally(madLibsStory, inputs);
             const cleanFilledStory = filledStory.replace(/<[^>]*>/g, '');
             
             // Generate detailed scene description using LLM
@@ -84,6 +84,18 @@ class CharacterGenerator {
             console.error('Error generating character:', error);
             throw error;
         }
+    }
+    
+    fillMadLibsLocally(template, userInputs) {
+        let filledText = template.text;
+        
+        for (const [placeholder, value] of Object.entries(userInputs)) {
+            const type = placeholder.split('-')[0];
+            const regex = new RegExp(`\\[${type}\\]`, 'g');
+            filledText = filledText.replace(regex, `<span class="highlight">${value}</span>`);
+        }
+        
+        return filledText;
     }
     
     async processImageForGame(imageUrl) {
